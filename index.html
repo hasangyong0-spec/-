@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>미래에셋증권 투자센터대구WM - 스마트 순번대기표 (실시간 동기화)</title>
+    <title>미래에셋증권 투자센터대구WM - 스마트 순번대기표 (로컬 저장 연동)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -35,15 +35,12 @@
     <!-- 상단 헤더 & 모드 전환 -->
     <header class="bg-mirae-navy text-white shadow-md sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
-            <!-- 로고 및 지점명 -->
             <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
                 <span class="font-extrabold text-base md:text-lg tracking-tight text-mirae-orange">MIRAE ASSET 미래에셋증권</span>
                 <span class="text-xs md:text-sm font-light text-gray-300">| 투자센터대구WM</span>
-                <!-- 실시간 날짜 및 시계 표시 -->
                 <span id="live-clock" class="text-[11px] md:text-xs bg-blue-900/80 text-orange-200 px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg border border-blue-700/50 inline-block font-mono ml-1"></span>
-                <span class="text-[10px] bg-emerald-600/80 text-emerald-100 px-1.5 py-0.5 rounded font-bold ml-1">☁️ 실시간 동기화중</span>
+                <span class="text-[10px] bg-emerald-600/80 text-emerald-100 px-1.5 py-0.5 rounded font-bold ml-1">💾 데이터 유지 모드</span>
             </div>
-            <!-- 화면 전환 탭 -->
             <div class="flex items-center space-x-2">
                 <div class="flex bg-blue-900/60 p-1 rounded-xl text-xs font-semibold">
                     <button id="btn-customer-view" onclick="switchView('customer')" class="px-3.5 py-1.5 rounded-lg bg-mirae-orange text-white shadow-sm transition">
@@ -59,22 +56,16 @@
 
     <main class="max-w-6xl mx-auto p-4">
 
-        <!-- ========================================== -->
-        <!-- 1. 고객용 모바일 웹페이지 (/customer)      -->
-        <!-- ========================================== -->
+        <!-- 1. 고객용 모바일 웹페이지 -->
         <section id="view-customer" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl overflow-hidden my-2 border border-gray-100 transition-all">
-            <!-- 모바일 헤더 -->
             <div class="bg-gradient-to-r from-mirae-navy to-blue-900 p-6 text-white text-center">
                 <p class="text-[11px] text-mirae-orange font-black uppercase tracking-widest mb-1">MIRAE ASSET SECURITIES</p>
                 <h1 class="text-xl font-bold tracking-tight">투자센터대구WM</h1>
                 <p class="text-xs text-gray-300 mt-1 font-medium">스마트 순번대기표 발급</p>
             </div>
 
-            <!-- 모바일 컨텐츠 -->
             <div class="p-6">
-                <!-- 발급 폼 -->
                 <div id="ticket-form" class="space-y-6">
-                    <!-- 1. 창구 구분 선택 -->
                     <div>
                         <label class="block text-sm font-bold text-mirae-navy mb-2.5">1. 원하시는 업무 창구를 선택해 주세요</label>
                         <div class="grid grid-cols-2 gap-3">
@@ -87,42 +78,27 @@
                         </div>
                     </div>
 
-                    <!-- 2-A. 일반 금융업무 세부 선택 -->
                     <div id="sub-cat-A-container" class="space-y-2">
                         <label class="block text-sm font-bold text-mirae-navy mb-2">2. 일반 세부 업무를 선택해 주세요</label>
-                        <div class="grid grid-cols-2 gap-2 text-xs font-semibold" id="sub-cat-A-grid">
-                            <!-- JS에서 동적 생성 -->
-                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs font-semibold" id="sub-cat-A-grid"></div>
                     </div>
 
-                    <!-- 2-B. 자산관리/상담 세부 선택 -->
                     <div id="sub-cat-B-container" class="hidden space-y-4">
-                        <!-- 고객 구분 선택 -->
                         <div>
                             <label class="block text-sm font-bold text-mirae-navy mb-2">2. 고객 구분을 선택해 주세요</label>
                             <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
-                                <button type="button" onclick="selectCustomerType('기존고객')" id="cust-type-기존고객" class="cust-type-btn border-2 border-blue-600 bg-blue-50 text-blue-800 py-2.5 rounded-xl font-bold transition text-center shadow-sm">
-                                    🏢 기존고객
-                                </button>
-                                <button type="button" onclick="selectCustomerType('신규고객')" id="cust-type-신규고객" class="cust-type-btn border-2 border-gray-200 bg-white text-gray-600 py-2.5 rounded-xl font-bold transition text-center hover:border-blue-300">
-                                    ✨ 신규고객
-                                </button>
-                                <button type="button" onclick="selectCustomerType('다이렉트 고객')" id="cust-type-다이렉트 고객" class="cust-type-btn border-2 border-gray-200 bg-white text-gray-600 py-2.5 rounded-xl font-bold transition text-center hover:border-blue-300">
-                                    📱 다이렉트
-                                </button>
+                                <button type="button" onclick="selectCustomerType('기존고객')" id="cust-type-기존고객" class="cust-type-btn border-2 border-blue-600 bg-blue-50 text-blue-800 py-2.5 rounded-xl font-bold transition text-center shadow-sm">🏢 기존고객</button>
+                                <button type="button" onclick="selectCustomerType('신규고객')" id="cust-type-신규고객" class="cust-type-btn border-2 border-gray-200 bg-white text-gray-600 py-2.5 rounded-xl font-bold transition text-center hover:border-blue-300">✨ 신규고객</button>
+                                <button type="button" onclick="selectCustomerType('다이렉트 고객')" id="cust-type-다이렉트 고객" class="cust-type-btn border-2 border-gray-200 bg-white text-gray-600 py-2.5 rounded-xl font-bold transition text-center hover:border-blue-300">📱 다이렉트</button>
                             </div>
                         </div>
 
-                        <!-- 상담 세부 상품 선택 -->
                         <div>
                             <label class="block text-sm font-bold text-mirae-navy mb-2">3. 상담하실 상품을 선택해 주세요</label>
-                            <div class="grid grid-cols-3 gap-2 text-xs font-semibold" id="sub-cat-B-grid">
-                                <!-- JS에서 동적 생성 -->
-                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-xs font-semibold" id="sub-cat-B-grid"></div>
                         </div>
                     </div>
 
-                    <!-- 발급 버튼 -->
                     <div class="text-center pt-2">
                         <button id="issue-btn" onclick="issueTicket()" class="bg-mirae-orange hover:bg-orange-600 text-white font-black py-4 px-8 rounded-2xl shadow-lg shadow-orange-200 transition text-base tracking-wide inline-flex items-center justify-center gap-2 w-fit mx-auto">
                             <span>⚡ 번호표 발급받기</span>
@@ -130,15 +106,10 @@
                     </div>
                 </div>
 
-                <!-- 발급 완료 대기 상태 표시 -->
                 <div id="ticket-result" class="hidden text-center py-4 space-y-5">
                     <div class="flex items-center justify-center space-x-2">
-                        <span class="inline-block bg-orange-100 text-mirae-orange px-3 py-1 rounded-full text-xs font-black" id="res-category-name">
-                            일반 금융업무
-                        </span>
-                        <span class="hidden inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-black" id="res-cust-type-badge">
-                            기존고객
-                        </span>
+                        <span class="inline-block bg-orange-100 text-mirae-orange px-3 py-1 rounded-full text-xs font-black" id="res-category-name">일반 금융업무</span>
+                        <span class="hidden inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-black" id="res-cust-type-badge">기존고객</span>
                     </div>
                     <div>
                         <p class="text-xs text-gray-400 font-medium">발행된 대기번호</p>
@@ -157,7 +128,6 @@
                     </div>
                     <p class="text-xs text-gray-400">순서가 되면 지점 전광판 및 안내 방송으로 호출해 드립니다.</p>
                     
-                    <!-- 추가 번호표 발급 버튼 -->
                     <div class="text-center pt-2">
                         <button onclick="resetCustomerView()" class="bg-orange-100 hover:bg-orange-200 text-mirae-orange font-black px-6 py-3 rounded-xl transition text-sm md:text-base shadow-sm inline-block w-fit mx-auto">
                             추가 번호표 발급하기
@@ -167,20 +137,14 @@
             </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- 2. 대기현황 대시보드 (/dashboard)          -->
-        <!-- ========================================== -->
+        <!-- 2. 대기현황 대시보드 -->
         <section id="view-dashboard" class="hidden space-y-6">
-
-            <!-- 상태 메시지 토스트 알림 바 -->
             <div id="tower-toast" class="hidden bg-mirae-navy text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-md flex items-center justify-between animate-fade-in">
                 <span id="tower-toast-msg">안내 메시지</span>
                 <button onclick="hideToast()" class="text-gray-300 hover:text-white font-bold ml-2">✕</button>
             </div>
 
-            <!-- 지점 현황 요약 카드 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- 일반 금융업무 대기 -->
                 <div class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-gray-100 border-l-8 border-l-mirae-orange flex items-center justify-between transition hover:shadow-md">
                     <div class="flex items-center space-x-3.5">
                         <span class="bg-mirae-orange text-white font-black text-xs md:text-sm px-3 py-1.5 rounded-xl shadow-sm whitespace-nowrap">창구</span>
@@ -198,7 +162,6 @@
                     </div>
                 </div>
 
-                <!-- 자산관리/상담 대기 -->
                 <div class="bg-white p-5 md:p-6 rounded-3xl shadow-sm border border-gray-100 border-l-8 border-l-blue-600 flex items-center justify-between transition hover:shadow-md">
                     <div class="flex items-center space-x-3.5">
                         <span class="bg-blue-600 text-white font-black text-xs md:text-sm px-3 py-1.5 rounded-xl shadow-sm whitespace-nowrap">창구</span>
@@ -217,10 +180,7 @@
                 </div>
             </div>
 
-            <!-- 세로 정렬된 실시간 대기 현황 영역 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <!-- 일반 금융업무 세로 대기목록 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col space-y-4 min-h-[480px]">
                     <div class="flex items-center justify-between border-b pb-3 border-gray-100">
                         <div class="flex items-center space-x-2">
@@ -229,14 +189,9 @@
                         </div>
                         <span class="text-xs font-bold text-mirae-orange bg-orange-50 px-3 py-1 rounded-full"><span id="a-queue-count-badge">0</span>명 대기 중</span>
                     </div>
-
-                    <!-- 대기자 리스트 -->
-                    <div class="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1 custom-scroll" id="a-queue-list">
-                        <!-- JS로 동적 생성 -->
-                    </div>
+                    <div class="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1 custom-scroll" id="a-queue-list"></div>
                 </div>
 
-                <!-- 자산관리/투자상담 세로 대기목록 -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col space-y-4 min-h-[480px]">
                     <div class="flex items-center justify-between border-b pb-3 border-gray-100">
                         <div class="flex items-center space-x-2">
@@ -245,37 +200,16 @@
                         </div>
                         <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full"><span id="b-queue-count-badge">0</span>명 대기 중</span>
                     </div>
-
-                    <!-- 대기자 리스트 -->
-                    <div class="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1 custom-scroll" id="b-queue-list">
-                        <!-- JS로 동적 생성 -->
-                    </div>
+                    <div class="space-y-3 flex-1 overflow-y-auto max-h-[600px] pr-1 custom-scroll" id="b-queue-list"></div>
                 </div>
-
             </div>
         </section>
 
     </main>
 
-    <!-- Firebase 실시간 동기화 스크립트 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mirae-daegu-wm-queue-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "",
-            authDomain: "",
-            projectId: "",
-            storageBucket: "",
-            messagingSenderId: "",
-            appId: ""
-        };
-
-        let db = null;
-        let auth = null;
-        let isFirebaseInitialized = false;
+    <!-- 로컬 스토리지 기반 데이터 유지 스크립트 -->
+    <script>
+        const STORAGE_KEY = 'mirae_daegu_queue_state_v2';
 
         const state = {
             selectedCategory: 'A',
@@ -290,75 +224,51 @@
 
         function getTodayString() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         }
 
-        // Firebase 데이터 동기화 저장 함수
-        async function saveStateToCloud() {
-            if (!isFirebaseInitialized || !db) return;
+        function loadStateFromStorage() {
             try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_state');
-                await setDoc(docRef, {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                const today = getTodayString();
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    // 당일 날짜가 같으면 기존 기록 유지
+                    if (data.date === today) {
+                        state.nextNumberA = data.nextNumberA || 1;
+                        state.nextNumberB = data.nextNumberB || 1;
+                        state.queue = Array.isArray(data.queue) ? data.queue : [];
+                    } else {
+                        // 날짜가 바뀌었으면 초기화
+                        resetLocalStorageData();
+                    }
+                }
+            } catch (e) {
+                console.warn("Load error:", e);
+            }
+        }
+
+        function saveStateToStorage() {
+            try {
+                const data = {
                     date: getTodayString(),
                     nextNumberA: state.nextNumberA,
                     nextNumberB: state.nextNumberB,
                     queue: state.queue,
                     updatedAt: Date.now()
-                });
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             } catch (e) {
-                console.warn("Cloud Sync Save Error:", e);
+                console.warn("Save error:", e);
             }
         }
 
-        // Firebase 실시간 리스너 설정
-        async function initFirebaseSync() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                isFirebaseInitialized = true;
-
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_state');
-                
-                // 실시간 onSnapshot 리스너 적용 (다른 직원이 발급/완료 시 즉시 반영됨)
-                onSnapshot(docRef, (docSnap) => {
-                    const today = getTodayString();
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        if (data.date === today) {
-                            state.nextNumberA = data.nextNumberA || 1;
-                            state.nextNumberB = data.nextNumberB || 1;
-                            state.queue = Array.isArray(data.queue) ? data.queue : [];
-                        } else {
-                            // 날짜가 바뀌었을 경우(자정이 지난 경우) 자동 초기화
-                            state.nextNumberA = 1;
-                            state.nextNumberB = 1;
-                            state.queue = [];
-                            saveStateToCloud();
-                        }
-                    } else {
-                        // 최초 문서 생성
-                        saveStateToCloud();
-                    }
-                    renderDashboard();
-                    updateMyTicketStatus();
-                }, (error) => {
-                    console.warn("Firestore snapshot error:", error);
-                });
-
-            } catch (e) {
-                console.warn("Firebase Init Failed, falling back to local state:", e);
-            }
+        function resetLocalStorageData() {
+            state.nextNumberA = 1;
+            state.nextNumberB = 1;
+            state.queue = [];
+            state.myTicket = null;
+            saveStateToStorage();
         }
 
         function updateLiveClock() {
@@ -367,19 +277,11 @@
             const days = ['일', '월', '화', '수', '목', '금', '토'];
             const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}(${days[now.getDay()]})`;
             const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-            const clockText = `📅 ${dateStr} ${timeStr}`;
-
-            if (clockEl) clockEl.innerText = clockText;
+            if (clockEl) clockEl.innerText = `📅 ${dateStr} ${timeStr}`;
         }
 
-        const subCategoriesA = [
-            '입출금/이체', '제증명/잔액증명', '통장/카드 이월', 
-            '계좌/비밀번호', '주식/채권 입출고', '기타 일반업무'
-        ];
-
-        const subCategoriesB = [
-            '주식', 'ETF', 'ELS', '채권', '연금/IRP', '기타상담'
-        ];
+        const subCategoriesA = ['입출금/이체', '제증명/잔액증명', '통장/카드 이월', '계좌/비밀번호', '주식/채권 입출고', '기타 일반업무'];
+        const subCategoriesB = ['주식', 'ETF', 'ELS', '채권', '연금/IRP', '기타상담'];
 
         function initSubCategoryGrids() {
             const gridA = document.getElementById('sub-cat-A-grid');
@@ -436,33 +338,24 @@
                 if (btnB) btnB.className = "cat-btn border-2 border-blue-600 bg-white text-blue-600 p-4 rounded-2xl font-black text-center transition flex flex-col justify-center items-center h-24 hover:bg-blue-50 text-lg";
                 containerA?.classList.remove('hidden');
                 containerB?.classList.add('hidden');
-
-                if (issueBtn) {
-                    issueBtn.className = "bg-mirae-orange hover:bg-orange-600 text-white font-black py-4 px-8 rounded-2xl shadow-lg shadow-orange-200 transition text-base tracking-wide inline-flex items-center justify-center gap-2 w-fit mx-auto";
-                }
+                if (issueBtn) issueBtn.className = "bg-mirae-orange hover:bg-orange-600 text-white font-black py-4 px-8 rounded-2xl shadow-lg shadow-orange-200 transition text-base tracking-wide inline-flex items-center justify-center gap-2 w-fit mx-auto";
             } else {
                 if (btnB) btnB.className = "cat-btn border-2 border-blue-600 bg-blue-600 text-white p-4 rounded-2xl font-black text-center transition flex flex-col justify-center items-center h-24 shadow-md text-lg";
                 if (btnA) btnA.className = "cat-btn border-2 border-mirae-orange bg-white text-mirae-orange p-4 rounded-2xl font-black text-center transition flex flex-col justify-center items-center h-24 hover:bg-orange-50 text-lg";
                 containerB?.classList.remove('hidden');
                 containerA?.classList.add('hidden');
-
-                if (issueBtn) {
-                    issueBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-2xl shadow-lg shadow-blue-200 transition text-base tracking-wide inline-flex items-center justify-center gap-2 w-fit mx-auto";
-                }
+                if (issueBtn) issueBtn.className = "bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-2xl shadow-lg shadow-blue-200 transition text-base tracking-wide inline-flex items-center justify-center gap-2 w-fit mx-auto";
             }
         };
 
         window.selectCustomerType = function(type) {
             state.selectedCustomerType = type;
-            const types = ['기존고객', '신규고객', '다이렉트 고객'];
-            types.forEach(t => {
+            ['기존고객', '신규고객', '다이렉트 고객'].forEach(t => {
                 const btn = document.getElementById(`cust-type-${t}`);
                 if (btn) {
-                    if (t === type) {
-                        btn.className = "cust-type-btn border-2 border-blue-600 bg-blue-50 text-blue-800 py-2.5 rounded-xl font-bold transition text-center shadow-sm";
-                    } else {
-                        btn.className = "cust-type-btn border-2 border-gray-200 bg-white text-gray-600 py-2.5 rounded-xl font-bold transition text-center hover:border-blue-300";
-                    }
+                    btn.className = (t === type) 
+                        ? "cust-type-btn border-2 border-blue-600 bg-blue-50 text-blue-800 py-2.5 rounded-xl font-bold transition text-center shadow-sm"
+                        : "cust-type-btn border-2 border-gray-200 bg-white text-gray-600 py-2.5 rounded-xl font-bold transition text-center hover:border-blue-300";
                 }
             });
         };
@@ -472,10 +365,8 @@
             document.querySelectorAll('.sub-A-btn').forEach(btn => {
                 btn.className = "sub-A-btn py-2.5 px-3 rounded-xl border-2 transition text-left border-gray-200 bg-white text-gray-600 hover:border-orange-200";
             });
-            const selectedBtn = document.getElementById(`sub-A-${sub}`);
-            if (selectedBtn) {
-                selectedBtn.className = "sub-A-btn py-2.5 px-3 rounded-xl border-2 transition text-left border-mirae-orange bg-orange-50 text-mirae-orange font-bold shadow-sm";
-            }
+            const sel = document.getElementById(`sub-A-${sub}`);
+            if (sel) sel.className = "sub-A-btn py-2.5 px-3 rounded-xl border-2 transition text-left border-mirae-orange bg-orange-50 text-mirae-orange font-bold shadow-sm";
         };
 
         window.selectSubCatB = function(sub) {
@@ -483,13 +374,12 @@
             document.querySelectorAll('.sub-B-btn').forEach(btn => {
                 btn.className = "sub-B-btn py-2.5 px-2.5 rounded-xl border-2 transition text-center border-gray-200 bg-white text-gray-600 hover:border-blue-200";
             });
-            const selectedBtn = document.getElementById(`sub-B-${sub}`);
-            if (selectedBtn) {
-                selectedBtn.className = "sub-B-btn py-2.5 px-2.5 rounded-xl border-2 transition text-center border-blue-600 bg-blue-50 text-blue-600 font-bold shadow-sm";
-            }
+            const sel = document.getElementById(`sub-B-${sub}`);
+            if (sel) sel.className = "sub-B-btn py-2.5 px-2.5 rounded-xl border-2 transition text-center border-blue-600 bg-blue-50 text-blue-600 font-bold shadow-sm";
         };
 
         window.issueTicket = function() {
+            loadStateFromStorage(); // 최신 상태 동기화
             const type = state.selectedCategory;
             const catName = type === 'A' ? '일반 금융업무' : '자산관리/상담';
             const ticketNum = type === 'A' ? state.nextNumberA++ : state.nextNumberB++;
@@ -508,38 +398,31 @@
 
             state.queue.push(newTicket);
             state.myTicket = newTicket;
-
-            saveStateToCloud();
+            saveStateToStorage();
 
             document.getElementById('ticket-form')?.classList.add('hidden');
             document.getElementById('ticket-result')?.classList.remove('hidden');
             
-            const elResCat = document.getElementById('res-category-name');
-            const elResNum = document.getElementById('res-ticket-num');
-            const elResDetail = document.getElementById('res-sub-detail');
-            
-            if (elResCat) elResCat.innerText = catName;
-            if (elResNum) elResNum.innerText = ticketId;
-            if (elResDetail) elResDetail.innerText = `용건: ${subDetail}`;
+            document.getElementById('res-category-name').innerText = catName;
+            document.getElementById('res-ticket-num').innerText = ticketId;
+            document.getElementById('res-sub-detail').innerText = `용건: ${subDetail}`;
 
-            const custTypeBadge = document.getElementById('res-cust-type-badge');
-            if (custTypeBadge) {
-                if (type === 'B') {
-                    custTypeBadge.innerText = state.selectedCustomerType;
-                    custTypeBadge.classList.remove('hidden');
-                } else {
-                    custTypeBadge.classList.add('hidden');
-                }
+            const badge = document.getElementById('res-cust-type-badge');
+            if (type === 'B') {
+                badge.innerText = state.selectedCustomerType;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
             }
 
             updateMyTicketStatus();
             renderDashboard();
-            showToast(`[신규 대기] ${ticketId} (${subDetail})이 발급되었습니다.`);
+            showToast(`[신규 대기] ${ticketId} 발급 완료`);
         };
 
         function updateMyTicketStatus() {
             if (!state.myTicket) return;
-
+            loadStateFromStorage();
             const myItem = state.queue.find(q => q.ticketId === state.myTicket.ticketId);
             const elWaitCount = document.getElementById('res-waiting-count');
             const elWaitTime = document.getElementById('res-waiting-time');
@@ -550,8 +433,8 @@
                 return;
             }
 
-            const activeSameTypeQueue = state.queue.filter(q => q.type === state.myTicket.type && q.status === 'waiting');
-            const myIndex = activeSameTypeQueue.findIndex(q => q.ticketId === state.myTicket.ticketId);
+            const activeQueue = state.queue.filter(q => q.type === state.myTicket.type && q.status === 'waiting');
+            const myIndex = activeQueue.findIndex(q => q.ticketId === state.myTicket.ticketId);
 
             if (myIndex > 0) {
                 if (elWaitCount) elWaitCount.innerText = `${myIndex} 명`;
@@ -569,6 +452,7 @@
         };
 
         window.assignStaff = function(ticketId) {
+            loadStateFromStorage();
             const inputEl = document.getElementById(`staff-input-${ticketId}`);
             if (!inputEl) return;
             const staffName = inputEl.value.trim();
@@ -576,20 +460,21 @@
             const item = state.queue.find(q => q.ticketId === ticketId);
             if (item) {
                 item.staffName = staffName;
-                saveStateToCloud();
+                saveStateToStorage();
                 renderDashboard();
-                showToast(`[직원지정] ${ticketId} 대기의 응대직원이 '${staffName || '미지정'}'(으)로 설정되었습니다.`);
+                showToast(`[직원지정] ${ticketId} -> ${staffName || '미지정'}`);
             }
         };
 
         window.completeTicket = function(ticketId) {
+            loadStateFromStorage();
             const item = state.queue.find(q => q.ticketId === ticketId);
             if (item) {
                 item.status = 'completed';
-                saveStateToCloud();
+                saveStateToStorage();
                 renderDashboard();
                 updateMyTicketStatus();
-                showToast(`[완료] ${ticketId} 대기건 처리가 완료되었습니다.`);
+                showToast(`[완료] ${ticketId} 처리 완료`);
             }
         };
 
@@ -599,9 +484,7 @@
             if (toast && toastMsg) {
                 toastMsg.innerText = msg;
                 toast.classList.remove('hidden');
-                setTimeout(() => {
-                    toast.classList.add('hidden');
-                }, 4000);
+                setTimeout(() => toast.classList.add('hidden'), 3000);
             }
         }
 
@@ -610,142 +493,87 @@
         };
 
         function renderDashboard() {
+            loadStateFromStorage();
             const waitingA = state.queue.filter(q => q.type === 'A' && q.status === 'waiting');
             const waitingB = state.queue.filter(q => q.type === 'B' && q.status === 'waiting');
 
-            const elTowerA = document.getElementById('tower-a-wait');
-            const elTowerB = document.getElementById('tower-b-wait');
-            const elBadgeA = document.getElementById('a-queue-count-badge');
-            const elBadgeB = document.getElementById('b-queue-count-badge');
-
-            if (elTowerA) elTowerA.innerText = waitingA.length;
-            if (elTowerB) elTowerB.innerText = waitingB.length;
-            if (elBadgeA) elBadgeA.innerText = waitingA.length;
-            if (elBadgeB) elBadgeB.innerText = waitingB.length;
+            document.getElementById('tower-a-wait').innerText = waitingA.length;
+            document.getElementById('tower-b-wait').innerText = waitingB.length;
+            document.getElementById('a-queue-count-badge').innerText = waitingA.length;
+            document.getElementById('b-queue-count-badge').innerText = waitingB.length;
 
             const listA = document.getElementById('a-queue-list');
             const allA = state.queue.filter(q => q.type === 'A');
 
             if (listA) {
-                if (allA.length === 0) {
-                    listA.innerHTML = `
-                        <div class="flex flex-col items-center justify-center py-16 text-gray-400">
-                            <span class="text-3xl mb-1">☕</span>
-                            <p class="text-xs font-medium">대기중인 일반 금융업무 고객이 없습니다.</p>
-                        </div>`;
-                } else {
-                    listA.innerHTML = allA.map(q => {
-                        const isCompleted = q.status === 'completed';
-                        const isAssigned = !isCompleted && q.staffName && q.staffName.trim() !== '';
-
-                        let badgeHtml = '';
-                        if (isCompleted) {
-                            badgeHtml = `<span class="bg-gray-200 text-gray-700 text-xs font-black px-2 py-0.5 rounded-md flex items-center gap-0.5">✓ 업무완료</span>`;
-                        } else if (isAssigned) {
-                            badgeHtml = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-black px-2 py-0.5 rounded-md flex items-center gap-0.5">👤 배정됨 (${q.staffName})</span>`;
-                        }
-
-                        let actionBtnHtml = '';
-                        if (isCompleted) {
-                            actionBtnHtml = `<span class="bg-gray-300 text-gray-700 text-xs font-black px-3 py-1.5 rounded-xl">✓ 업무완료</span>`;
-                        } else {
-                            actionBtnHtml = `<button onclick="completeTicket('${q.ticketId}')" class="bg-mirae-orange hover:bg-orange-600 text-white text-xs font-black px-3.5 py-1.5 rounded-xl transition shadow-sm whitespace-nowrap">업무완료</button>`;
-                        }
-
-                        let assignBtnHtml = '';
-                        if (!isCompleted) {
-                            assignBtnHtml = `<button onclick="assignStaff('${q.ticketId}')" class="bg-gray-700 hover:bg-gray-800 text-white text-[11px] font-bold px-2 py-1 rounded-lg transition whitespace-nowrap">${q.staffName ? '수정' : '지정'}</button>`;
-                        }
-
-                        return `
-                        <div class="p-4 rounded-2xl border transition-all ${isCompleted ? 'bg-gray-100 border-gray-200 opacity-60' : 'bg-orange-50/50 border-orange-100 hover:border-mirae-orange shadow-sm'} flex flex-col space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
-                                    <span class="text-xl font-black text-mirae-orange">${q.ticketId}</span>
-                                    <span class="bg-orange-100 text-mirae-orange text-xs font-extrabold px-2.5 py-0.5 rounded-md">${q.subCategory}</span>
-                                    ${badgeHtml}
-                                </div>
+                listA.innerHTML = allA.length === 0 ? `
+                    <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                        <span class="text-3xl mb-1">☕</span>
+                        <p class="text-xs font-medium">대기중인 일반 금융업무 고객이 없습니다.</p>
+                    </div>` : allA.map(q => {
+                    const isCompleted = q.status === 'completed';
+                    const isAssigned = !isCompleted && q.staffName && q.staffName.trim() !== '';
+                    return `
+                    <div class="p-4 rounded-2xl border transition-all ${isCompleted ? 'bg-gray-100 border-gray-200 opacity-60' : 'bg-orange-50/50 border-orange-100 shadow-sm'} flex flex-col space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2.5 flex-wrap gap-y-1">
+                                <span class="text-xl font-black text-mirae-orange">${q.ticketId}</span>
+                                <span class="bg-orange-100 text-mirae-orange text-xs font-extrabold px-2.5 py-0.5 rounded-md">${q.subCategory}</span>
+                                ${isCompleted ? '<span class="bg-gray-200 text-gray-700 text-xs font-black px-2 py-0.5 rounded-md">✓ 업무완료</span>' : ''}
+                                ${isAssigned ? `<span class="bg-emerald-100 text-emerald-800 border text-xs font-black px-2 py-0.5 rounded-md">👤 ${q.staffName}</span>` : ''}
                             </div>
-
-                            <div class="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
-                                <div class="flex items-center space-x-1.5 flex-1">
-                                    <input type="text" id="staff-input-${q.ticketId}" value="${q.staffName || ''}" placeholder="응대직원" 
-                                        ${isCompleted ? 'disabled' : ''}
-                                        class="w-24 px-2.5 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-mirae-orange bg-white">
-                                    ${assignBtnHtml}
-                                </div>
-                                ${actionBtnHtml}
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
+                            <div class="flex items-center space-x-1.5 flex-1">
+                                <input type="text" id="staff-input-${q.ticketId}" value="${q.staffName || ''}" placeholder="응대직원" ${isCompleted ? 'disabled' : ''} class="w-24 px-2.5 py-1 text-xs border rounded-lg bg-white">
+                                ${!isCompleted ? `<button onclick="assignStaff('${q.ticketId}')" class="bg-gray-700 text-white text-[11px] font-bold px-2 py-1 rounded-lg">지정</button>` : ''}
                             </div>
-                        </div>`;
-                    }).join('');
-                }
+                            ${isCompleted ? '<span class="bg-gray-300 text-gray-700 text-xs font-black px-3 py-1.5 rounded-xl">완료됨</span>' : `<button onclick="completeTicket('${q.ticketId}')" class="bg-mirae-orange text-white text-xs font-black px-3.5 py-1.5 rounded-xl">업무완료</button>`}
+                        </div>
+                    </div>`;
+                }).join('');
             }
 
             const listB = document.getElementById('b-queue-list');
             const allB = state.queue.filter(q => q.type === 'B');
 
             if (listB) {
-                if (allB.length === 0) {
-                    listB.innerHTML = `
-                        <div class="flex flex-col items-center justify-center py-16 text-gray-400">
-                            <span class="text-3xl mb-1">📈</span>
-                            <p class="text-xs font-medium">대기중인 자산관리/상담 고객이 없습니다.</p>
-                        </div>`;
-                } else {
-                    listB.innerHTML = allB.map(q => {
-                        const isCompleted = q.status === 'completed';
-                        const isAssigned = !isCompleted && q.staffName && q.staffName.trim() !== '';
-
-                        let badgeHtml = '';
-                        if (isCompleted) {
-                            badgeHtml = `<span class="bg-gray-200 text-gray-700 text-xs font-black px-2 py-0.5 rounded-md flex items-center gap-0.5">✓ 상담완료</span>`;
-                        } else if (isAssigned) {
-                            badgeHtml = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-black px-2 py-0.5 rounded-md flex items-center gap-0.5">👤 배정됨 (${q.staffName})</span>`;
-                        }
-
-                        let actionBtnHtml = '';
-                        if (isCompleted) {
-                            actionBtnHtml = `<span class="bg-gray-300 text-gray-700 text-xs font-black px-3 py-1.5 rounded-xl">✓ 상담완료</span>`;
-                        } else {
-                            actionBtnHtml = `<button onclick="completeTicket('${q.ticketId}')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-black px-3.5 py-1.5 rounded-xl transition shadow-sm whitespace-nowrap">상담완료</button>`;
-                        }
-
-                        let assignBtnHtml = '';
-                        if (!isCompleted) {
-                            assignBtnHtml = `<button onclick="assignStaff('${q.ticketId}')" class="bg-gray-700 hover:bg-gray-800 text-white text-[11px] font-bold px-2 py-1 rounded-lg transition whitespace-nowrap">${q.staffName ? '수정' : '지정'}</button>`;
-                        }
-
-                        return `
-                        <div class="p-4 rounded-2xl border transition-all ${isCompleted ? 'bg-gray-100 border-gray-200 opacity-60' : 'bg-blue-50/50 border-blue-100 hover:border-blue-500 shadow-sm'} flex flex-col space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                                    <span class="text-xl font-black text-blue-600">${q.ticketId}</span>
-                                    <span class="bg-blue-600 text-white text-[11px] font-extrabold px-2 py-0.5 rounded-md">${q.customerType}</span>
-                                    <span class="bg-blue-100 text-blue-800 text-xs font-extrabold px-2.5 py-0.5 rounded-md">${q.subCategory}</span>
-                                    ${badgeHtml}
-                                </div>
+                listB.innerHTML = allB.length === 0 ? `
+                    <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                        <span class="text-3xl mb-1">📈</span>
+                        <p class="text-xs font-medium">대기중인 자산관리/상담 고객이 없습니다.</p>
+                    </div>` : allB.map(q => {
+                    const isCompleted = q.status === 'completed';
+                    const isAssigned = !isCompleted && q.staffName && q.staffName.trim() !== '';
+                    return `
+                    <div class="p-4 rounded-2xl border transition-all ${isCompleted ? 'bg-gray-100 border-gray-200 opacity-60' : 'bg-blue-50/50 border-blue-100 shadow-sm'} flex flex-col space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                                <span class="text-xl font-black text-blue-600">${q.ticketId}</span>
+                                <span class="bg-blue-600 text-white text-[11px] font-extrabold px-2 py-0.5 rounded-md">${q.customerType}</span>
+                                <span class="bg-blue-100 text-blue-800 text-xs font-extrabold px-2.5 py-0.5 rounded-md">${q.subCategory}</span>
+                                ${isCompleted ? '<span class="bg-gray-200 text-gray-700 text-xs font-black px-2 py-0.5 rounded-md">✓ 상담완료</span>' : ''}
+                                ${isAssigned ? `<span class="bg-emerald-100 text-emerald-800 border text-xs font-black px-2 py-0.5 rounded-md">👤 ${q.staffName}</span>` : ''}
                             </div>
-
-                            <div class="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
-                                <div class="flex items-center space-x-1.5 flex-1">
-                                    <input type="text" id="staff-input-${q.ticketId}" value="${q.staffName || ''}" placeholder="응대직원" 
-                                        ${isCompleted ? 'disabled' : ''}
-                                        class="w-24 px-2.5 py-1 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
-                                    ${assignBtnHtml}
-                                </div>
-                                ${actionBtnHtml}
+                        </div>
+                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
+                            <div class="flex items-center space-x-1.5 flex-1">
+                                <input type="text" id="staff-input-${q.ticketId}" value="${q.staffName || ''}" placeholder="응대직원" ${isCompleted ? 'disabled' : ''} class="w-24 px-2.5 py-1 text-xs border rounded-lg bg-white">
+                                ${!isCompleted ? `<button onclick="assignStaff('${q.ticketId}')" class="bg-gray-700 text-white text-[11px] font-bold px-2 py-1 rounded-lg">지정</button>` : ''}
                             </div>
-                        </div>`;
-                    }).join('');
-                }
+                            ${isCompleted ? '<span class="bg-gray-300 text-gray-700 text-xs font-black px-3 py-1.5 rounded-xl">완료됨</span>' : `<button onclick="completeTicket('${q.ticketId}')" class="bg-blue-600 text-white text-xs font-black px-3.5 py-1.5 rounded-xl">상담완료</button>`}
+                        </div>
+                    </div>`;
+                }).join('');
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadStateFromStorage();
             initSubCategoryGrids();
             updateLiveClock();
             setInterval(updateLiveClock, 1000);
-            initFirebaseSync();
+            renderDashboard();
         });
     </script>
 </body>
