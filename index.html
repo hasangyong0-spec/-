@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>미래에셋증권 투자센터대구WM - 스마트 순번대기표 (로컬 저장 연동)</title>
+    <title>미래에셋증권 투자센터대구WM - 스마트 순번대기표 (실시간 연동)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -39,7 +39,7 @@
                 <span class="font-extrabold text-base md:text-lg tracking-tight text-mirae-orange">MIRAE ASSET 미래에셋증권</span>
                 <span class="text-xs md:text-sm font-light text-gray-300">| 투자센터대구WM</span>
                 <span id="live-clock" class="text-[11px] md:text-xs bg-blue-900/80 text-orange-200 px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg border border-blue-700/50 inline-block font-mono ml-1"></span>
-                <span class="text-[10px] bg-emerald-600/80 text-emerald-100 px-1.5 py-0.5 rounded font-bold ml-1">💾 데이터 유지 모드</span>
+                <span class="text-[10px] bg-emerald-600/80 text-emerald-100 px-1.5 py-0.5 rounded font-bold ml-1">⚡ 실시간 공유 모드</span>
             </div>
             <div class="flex items-center space-x-2">
                 <div class="flex bg-blue-900/60 p-1 rounded-xl text-xs font-semibold">
@@ -207,11 +207,28 @@
 
     </main>
 
-    <!-- 로컬 스토리지 기반 데이터 유지 스크립트 -->
-    <script>
-        const STORAGE_KEY = 'mirae_daegu_queue_state_v2';
+    <!-- Firebase 실시간 데이터 연동 스크립트 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const state = {
+        const firebaseConfig = {
+            apiKey: "AIzaSyAaxt7b0uZ7_Dkeed9X4rOX3nUiMbjC_-A",
+            authDomain: "mirae-daegu.firebaseapp.com",
+            databaseURL: "https://mirae-daegu-default-rtdb.firebaseio.com",
+            projectId: "mirae-daegu",
+            storageBucket: "mirae-daegu.firebasestorage.app",
+            messagingSenderId: "214878140482",
+            appId: "1:214878140482:web:dd144948484eb5c96855db",
+            measurementId: "G-5RCL5PF1YB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        // DB 경로를 명확하게 하나로 고정
+        const dbRef = ref(db, 'daegu_wm_queue_v3');
+
+        let state = {
             selectedCategory: 'A',
             selectedCustomerType: '기존고객',
             selectedSubCategoryA: '입출금/이체',
@@ -222,53 +239,31 @@
             queue: []
         };
 
-        function getTodayString() {
-            const now = new Date();
-            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        }
-
-        function loadStateFromStorage() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                const today = getTodayString();
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    // 당일 날짜가 같으면 기존 기록 유지
-                    if (data.date === today) {
-                        state.nextNumberA = data.nextNumberA || 1;
-                        state.nextNumberB = data.nextNumberB || 1;
-                        state.queue = Array.isArray(data.queue) ? data.queue : [];
-                    } else {
-                        // 날짜가 바뀌었으면 초기화
-                        resetLocalStorageData();
-                    }
+        // 실시간 데이터 수신 (다른 기기에서 변경 즉시 반영)
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                state.nextNumberA = data.nextNumberA ?? 1;
+                state.nextNumberB = data.nextNumberB ?? 1;
+                state.queue = Array.isArray(data.queue) ? data.queue : [];
+                
+                renderDashboard();
+                if (state.myTicket) {
+                    updateMyTicketStatus();
                 }
-            } catch (e) {
-                console.warn("Load error:", e);
             }
-        }
+        });
 
-        function saveStateToStorage() {
-            try {
-                const data = {
-                    date: getTodayString(),
-                    nextNumberA: state.nextNumberA,
-                    nextNumberB: state.nextNumberB,
-                    queue: state.queue,
-                    updatedAt: Date.now()
-                };
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            } catch (e) {
-                console.warn("Save error:", e);
-            }
-        }
-
-        function resetLocalStorageData() {
-            state.nextNumberA = 1;
-            state.nextNumberB = 1;
-            state.queue = [];
-            state.myTicket = null;
-            saveStateToStorage();
+        // Firebase에 데이터 저장
+        function saveStateToFirebase() {
+            set(dbRef, {
+                nextNumberA: state.nextNumberA,
+                nextNumberB: state.nextNumberB,
+                queue: state.queue,
+                updatedAt: Date.now()
+            }).catch((error) => {
+                console.error("Firebase 저장 실패:", error);
+            });
         }
 
         function updateLiveClock() {
@@ -379,7 +374,6 @@
         };
 
         window.issueTicket = function() {
-            loadStateFromStorage(); // 최신 상태 동기화
             const type = state.selectedCategory;
             const catName = type === 'A' ? '일반 금융업무' : '자산관리/상담';
             const ticketNum = type === 'A' ? state.nextNumberA++ : state.nextNumberB++;
@@ -398,7 +392,7 @@
 
             state.queue.push(newTicket);
             state.myTicket = newTicket;
-            saveStateToStorage();
+            saveStateToFirebase();
 
             document.getElementById('ticket-form')?.classList.add('hidden');
             document.getElementById('ticket-result')?.classList.remove('hidden');
@@ -416,13 +410,11 @@
             }
 
             updateMyTicketStatus();
-            renderDashboard();
             showToast(`[신규 대기] ${ticketId} 발급 완료`);
         };
 
         function updateMyTicketStatus() {
             if (!state.myTicket) return;
-            loadStateFromStorage();
             const myItem = state.queue.find(q => q.ticketId === state.myTicket.ticketId);
             const elWaitCount = document.getElementById('res-waiting-count');
             const elWaitTime = document.getElementById('res-waiting-time');
@@ -452,7 +444,6 @@
         };
 
         window.assignStaff = function(ticketId) {
-            loadStateFromStorage();
             const inputEl = document.getElementById(`staff-input-${ticketId}`);
             if (!inputEl) return;
             const staffName = inputEl.value.trim();
@@ -460,19 +451,16 @@
             const item = state.queue.find(q => q.ticketId === ticketId);
             if (item) {
                 item.staffName = staffName;
-                saveStateToStorage();
-                renderDashboard();
+                saveStateToFirebase();
                 showToast(`[직원지정] ${ticketId} -> ${staffName || '미지정'}`);
             }
         };
 
         window.completeTicket = function(ticketId) {
-            loadStateFromStorage();
             const item = state.queue.find(q => q.ticketId === ticketId);
             if (item) {
                 item.status = 'completed';
-                saveStateToStorage();
-                renderDashboard();
+                saveStateToFirebase();
                 updateMyTicketStatus();
                 showToast(`[완료] ${ticketId} 처리 완료`);
             }
@@ -493,14 +481,18 @@
         };
 
         function renderDashboard() {
-            loadStateFromStorage();
             const waitingA = state.queue.filter(q => q.type === 'A' && q.status === 'waiting');
             const waitingB = state.queue.filter(q => q.type === 'B' && q.status === 'waiting');
 
-            document.getElementById('tower-a-wait').innerText = waitingA.length;
-            document.getElementById('tower-b-wait').innerText = waitingB.length;
-            document.getElementById('a-queue-count-badge').innerText = waitingA.length;
-            document.getElementById('b-queue-count-badge').innerText = waitingB.length;
+            const aWaitEl = document.getElementById('tower-a-wait');
+            const bWaitEl = document.getElementById('tower-b-wait');
+            const aCountBadge = document.getElementById('a-queue-count-badge');
+            const bCountBadge = document.getElementById('b-queue-count-badge');
+
+            if (aWaitEl) aWaitEl.innerText = waitingA.length;
+            if (bWaitEl) bWaitEl.innerText = waitingB.length;
+            if (aCountBadge) aCountBadge.innerText = waitingA.length;
+            if (bCountBadge) bCountBadge.innerText = waitingB.length;
 
             const listA = document.getElementById('a-queue-list');
             const allA = state.queue.filter(q => q.type === 'A');
@@ -569,11 +561,9 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            loadStateFromStorage();
             initSubCategoryGrids();
             updateLiveClock();
             setInterval(updateLiveClock, 1000);
-            renderDashboard();
         });
     </script>
 </body>
