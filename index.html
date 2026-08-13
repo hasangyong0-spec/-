@@ -225,7 +225,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        // DB 경로를 명확하게 하나로 고정
         const dbRef = ref(db, 'daegu_wm_queue_v3');
 
         let state = {
@@ -466,6 +465,15 @@
             }
         };
 
+        // 잘못 발급된 대기 항목 삭제 함수 추가
+        window.deleteTicket = function(ticketId) {
+            if (!confirm(`[${ticketId}] 번호표를 삭제하시겠습니까?`)) return;
+            
+            state.queue = state.queue.filter(q => q.ticketId !== ticketId);
+            saveStateToFirebase();
+            showToast(`[삭제] ${ticketId} 삭제됨`);
+        };
+
         function showToast(msg) {
             const toast = document.getElementById('tower-toast');
             const toastMsg = document.getElementById('tower-toast-msg');
@@ -514,6 +522,7 @@
                                 ${isCompleted ? '<span class="bg-gray-200 text-gray-700 text-xs font-black px-2 py-0.5 rounded-md">✓ 업무완료</span>' : ''}
                                 ${isAssigned ? `<span class="bg-emerald-100 text-emerald-800 border text-xs font-black px-2 py-0.5 rounded-md">👤 ${q.staffName}</span>` : ''}
                             </div>
+                            <button onclick="deleteTicket('${q.ticketId}')" class="text-gray-400 hover:text-red-600 text-xs font-bold px-2 py-1 rounded transition" title="삭제">🗑️ 삭제</button>
                         </div>
                         <div class="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
                             <div class="flex items-center space-x-1.5 flex-1">
@@ -547,6 +556,7 @@
                                 ${isCompleted ? '<span class="bg-gray-200 text-gray-700 text-xs font-black px-2 py-0.5 rounded-md">✓ 상담완료</span>' : ''}
                                 ${isAssigned ? `<span class="bg-emerald-100 text-emerald-800 border text-xs font-black px-2 py-0.5 rounded-md">👤 ${q.staffName}</span>` : ''}
                             </div>
+                            <button onclick="deleteTicket('${q.ticketId}')" class="text-gray-400 hover:text-red-600 text-xs font-bold px-2 py-1 rounded transition" title="삭제">🗑️ 삭제</button>
                         </div>
                         <div class="flex items-center justify-between gap-2 pt-1 border-t border-gray-100">
                             <div class="flex items-center space-x-1.5 flex-1">
