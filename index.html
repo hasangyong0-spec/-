@@ -238,13 +238,34 @@
             queue: []
         };
 
+        // [추가] 날짜(한국시간 기준) 변경 시 초기화용
+        function getTodayKST() {
+            return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+        }
+        let currentDate = getTodayKST();
+
+        function resetDaily() {
+            currentDate = getTodayKST();
+            state.nextNumberA = 1;
+            state.nextNumberB = 1;
+            state.queue = [];
+            state.myTicket = null;
+            renderDashboard();
+            saveStateToFirebase();
+        }
+
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                // [추가] 저장된 날짜가 오늘과 다르면 기록 초기화
+                if (data.savedDate !== getTodayKST()) {
+                    resetDaily();
+                    return;
+                }
                 state.nextNumberA = data.nextNumberA ?? 1;
                 state.nextNumberB = data.nextNumberB ?? 1;
                 state.queue = Array.isArray(data.queue) ? data.queue : [];
-                
+
                 renderDashboard();
                 if (state.myTicket) {
                     updateMyTicketStatus();
@@ -252,8 +273,14 @@
             }
         });
 
+        // [추가] 화면을 켜둔 상태에서 자정이 지나면 자동 초기화 (1분 주기 확인)
+        setInterval(() => {
+            if (getTodayKST() !== currentDate) resetDaily();
+        }, 60000);
+
         function saveStateToFirebase() {
             set(dbRef, {
+                savedDate: getTodayKST(),
                 nextNumberA: state.nextNumberA,
                 nextNumberB: state.nextNumberB,
                 queue: state.queue,
